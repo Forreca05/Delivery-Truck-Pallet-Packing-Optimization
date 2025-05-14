@@ -5,13 +5,37 @@
 #include "parser.h"
 
 int main() {
-    std::string filePathPallets = "../data/Pallets_01.csv";
-    std::string filePathTruckAndPallets = "../data/TruckAndPallets_01.csv";
+    std::cout << "Please choose which dataset to use (1 - 9)" << std::endl;
+    std::string dataIndex;
+    std::cin >> dataIndex;
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::string filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
+    std::string filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
     
     std::vector<Pallet> pallets = parsePalletsCSV(filePathPallets);
     int capacity = parseTruckAndPalletsCSV(filePathTruckAndPallets);
 
-    std::vector<Pallet> result = exhaustiveSearch(pallets, capacity);
+    std::cout << "Please choose which algorithm to use" << std::endl;
+    std::cout << "[1] Exhaustive Search" << std::endl;
+    std::cout << "[2] Dynamic Programming" << std::endl;
+    int algorithmIndex;
+    std::cin >> algorithmIndex;
+
+    std::vector<Pallet> result;
+    switch (algorithmIndex) {
+        case 1:
+            result = exhaustiveSearch(pallets, capacity);
+            break;
+        case 2:
+            result = dynamicProgramming(pallets, capacity);
+            break;
+        default:
+            std::cout << "Please select one of the presented algorithms" << std::endl;
+            return 1;
+    }
+    std::cout << std::endl;
 
     std::cout << "Optimal solution:" << std::endl;
 
