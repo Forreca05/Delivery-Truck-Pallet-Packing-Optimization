@@ -37,7 +37,8 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
 
 std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int capacity) {
     int n = pallets.size();
-    int dp[n + 1][capacity + 1] = {};
+
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(capacity + 1));
 
     for (int i = 1; i <= n; i++) {
         Pallet currentPallet = pallets[i - 1];

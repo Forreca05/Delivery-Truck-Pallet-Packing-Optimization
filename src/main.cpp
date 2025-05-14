@@ -9,7 +9,6 @@ int main() {
     std::string dataIndex;
     std::cin >> dataIndex;
     std::cout << std::endl;
-    std::cout << std::endl;
 
     std::string filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
     std::string filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
