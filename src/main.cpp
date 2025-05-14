@@ -19,6 +19,7 @@ int main() {
     std::cout << "Please choose which algorithm to use" << std::endl;
     std::cout << "[1] Exhaustive Search" << std::endl;
     std::cout << "[2] Dynamic Programming" << std::endl;
+    std::cout << "[3] Approximation Algorithm" << std::endl;
     int algorithmIndex;
     std::cin >> algorithmIndex;
 
@@ -29,6 +30,9 @@ int main() {
             break;
         case 2:
             result = dynamicProgramming(pallets, capacity);
+            break;
+        case 3:
+            result = approximationAlgorithm(pallets, capacity);
             break;
         default:
             std::cout << "Please select one of the presented algorithms" << std::endl;

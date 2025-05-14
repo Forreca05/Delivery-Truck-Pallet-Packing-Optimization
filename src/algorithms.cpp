@@ -1,4 +1,5 @@
 #include "algorithms.h"
+#include <algorithm>
 #include <iostream>
 
 std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int capacity) {
@@ -61,4 +62,67 @@ std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int c
         i--;
     }
     return result;
+}
+
+std::vector<Pallet> greedySolutionA(const std::vector<Pallet>& pallets, int capacity) {
+    int n = pallets.size();
+
+    std::vector<std::pair<Pallet, int>> copy;
+    for (int i = 0; i < n; i++) {
+        copy.push_back({pallets[i], i});
+    }
+    std::sort(copy.begin(), copy.end(), [](std::pair<Pallet, int> a, std::pair<Pallet, int> b){
+        return (double)a.first.profit / a.first.weight > (double)b.first.profit / b.first.weight;
+    });
+
+    int currentWeight = 0;
+    std::vector<Pallet> result(pallets.size(), {0, 0});
+
+    for (int i = 0; i < n; i++) {
+        if (currentWeight + copy[i].first.weight > capacity) break;
+        currentWeight += copy[i].first.weight;
+        result[copy[i].second] = copy[i].first;
+    }
+    
+    return result;
+}
+
+std::vector<Pallet> greedySolutionB(const std::vector<Pallet>& pallets, int capacity) {
+    int n = pallets.size();
+
+    std::vector<std::pair<Pallet, int>> copy;
+    for (int i = 0; i < n; i++) {
+        copy.push_back({pallets[i], i});
+    }
+    std::sort(copy.begin(), copy.end(), [](std::pair<Pallet, int> a, std::pair<Pallet, int> b){
+        if (a.first.profit == b.first.profit) {
+            return a.first.weight < b.first.weight;
+        }
+        return a.first.profit > b.first.profit;
+    });
+
+    int currentWeight = 0;
+    std::vector<Pallet> result(pallets.size(), {0, 0});
+
+    for (int i = 0; i < n; i++) {
+        if (currentWeight + copy[i].first.weight > capacity) break;
+        currentWeight += copy[i].first.weight;
+        result[copy[i].second] = copy[i].first;
+    }
+    
+    return result;
+}
+
+std::vector<Pallet> approximationAlgorithm(const std::vector<Pallet>& pallets, int capacity) {
+    std::vector<Pallet> resultA = greedySolutionA(pallets, capacity);
+    std::vector<Pallet> resultB = greedySolutionB(pallets, capacity);
+
+    int profitA = 0;
+    int profitB = 0;
+
+    for (Pallet p : resultA) profitA += p.profit;
+    for (Pallet p : resultB) profitB += p.profit;
+
+    if (profitA > profitB) return resultA;
+    else return resultB;
 }
