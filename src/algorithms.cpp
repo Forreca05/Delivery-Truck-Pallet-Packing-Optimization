@@ -40,10 +40,11 @@ std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int c
     int dp[n + 1][capacity + 1] = {};
 
     for (int i = 1; i <= n; i++) {
+        Pallet currentPallet = pallets[i - 1];
         for (int j = 0; j <= capacity; j++) {
             dp[i][j] = dp[i - 1][j];
             if (j - pallets[i - 1].weight < 0) continue;
-            dp[i][j] = std::max(dp[i][j], dp[i - 1][j - pallets[i - 1].weight] + pallets[i - 1].profit);
+            dp[i][j] = std::max(dp[i][j], dp[i - 1][j - currentPallet.weight] + currentPallet.profit);
         }
     }
 
