@@ -1,3 +1,8 @@
+/**
+ * @file main.cpp
+ * @brief Entry point for the Delivery Truck Pallet Packing Optimization project.
+ */
+
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -6,6 +11,15 @@
 #include "algorithms.h"
 #include "parser.h"
 
+/**
+ * @brief The main function providing a CLI to choose dataset and algorithm.
+ * 
+ * Users can choose between 10 datasets and 5 different algorithms (exhaustive, backtracking,
+ * dynamic programming, approximation and integer linear). It loads the data, runs the selected algorithm,
+ * and prints the resulting optimal (or approximate) pallet packing.
+ * 
+ * @return int Exit status.
+ */
 int main() {
     std::cout << "Please choose which dataset to use (1 - 10)" << std::endl;
     std::string dataIndex, filePathPallets, filePathTruckAndPallets;
@@ -24,15 +38,16 @@ int main() {
         filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
         filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
     }
-    
+
     std::vector<Pallet> pallets = parsePalletsCSV(filePathPallets);
     int capacity = parseTruckAndPalletsCSV(filePathTruckAndPallets);
 
     std::cout << "Please choose which algorithm to use" << std::endl;
     std::cout << "[1] Exhaustive Search" << std::endl;
-    std::cout << "[2] Dynamic Programming" << std::endl;
-    std::cout << "[3] Approximation Algorithm" << std::endl;
-    std::cout << "[4] Integer Linear Programming" << std::endl;
+    std::cout << "[2] Backtracking" << std::endl;
+    std::cout << "[3] Dynamic Programming" << std::endl;
+    std::cout << "[4] Approximation Algorithm" << std::endl;
+    std::cout << "[5] Integer Linear Programming" << std::endl;
     int algorithmIndex;
     std::cin >> algorithmIndex;
 
@@ -43,13 +58,13 @@ int main() {
             result = exhaustiveSearch(pallets, capacity);
             break;
         case 2:
-            result = dynamicProgramming(pallets, capacity);
+            result = backtracking(pallets, capacity);
             break;
         case 3:
-            result = approximationAlgorithm(pallets, capacity);
+            result = dynamicProgramming(pallets, capacity);
             break;
         case 4:
-            result = integerLinearProgramming(pallets, capacity);
+            result = approximationAlgorithm(pallets, capacity);
             break;
         default:
             std::cout << "Please select one of the presented algorithms" << std::endl;
