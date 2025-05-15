@@ -12,7 +12,7 @@ int main() {
     std::cin >> dataIndex;
     std::cout << std::endl;
 
-    if (dataIndex < "1" || dataIndex > "10") {
+    if (stoi(dataIndex) < 1 || stoi(dataIndex) > 10) {
         std::cout << "Please select a dataset between 1 and 10" << std::endl;
         return 1;
     }
@@ -32,6 +32,7 @@ int main() {
     std::cout << "[1] Exhaustive Search" << std::endl;
     std::cout << "[2] Dynamic Programming" << std::endl;
     std::cout << "[3] Approximation Algorithm" << std::endl;
+    std::cout << "[4] Integer Linear Programming" << std::endl;
     int algorithmIndex;
     std::cin >> algorithmIndex;
 
@@ -47,6 +48,9 @@ int main() {
         case 3:
             result = approximationAlgorithm(pallets, capacity);
             break;
+        case 4:
+            result = integerLinearProgramming(pallets, capacity);
+            break;
         default:
             std::cout << "Please select one of the presented algorithms" << std::endl;
             return 1;
@@ -61,9 +65,15 @@ int main() {
     std::cout << "Optimal solution:" << std::endl;
 
     int nPallets = pallets.size();
+    int totalWeight = 0;
+    int totalProfit = 0;
     for (int i = 0; i < nPallets; i++) {
         if (result[i].weight == 0 && result[i].profit == 0) continue;
+        totalWeight += result[i].weight;
+        totalProfit += result[i].profit;
         std::cout << i + 1 << ' ' << result[i].weight << ' ' << result[i].profit << std::endl;
     }
+    std::cout << "Total weight = " << totalWeight << std::endl;
+    std::cout << "Total profit = " << totalProfit << std::endl;
     return 0;
 }
