@@ -3,6 +3,10 @@
 #include <iostream>
 #include <functional>
 
+// ====================================================================== //
+// ========================= EXHAUSTIVE SEARCH ========================== //
+// ====================================================================== //
+
 std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int capacity) {
     size_t n = pallets.size();
     int bestProfit = 0;
@@ -38,9 +42,17 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
     return result;
 }
 
+// ====================================================================== //
+// ============================ BACKTRACKING ============================ //
+// ====================================================================== //
+
 std::vector<Pallet> backtracking(const std::vector<Pallet>& pallets, int capacity) {
     return {};
 }
+
+// ====================================================================== //
+// ========================= DYNAMIC PROGRAMMING ======================== //
+// ====================================================================== //
 
 std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int capacity) {
     int n = pallets.size();
