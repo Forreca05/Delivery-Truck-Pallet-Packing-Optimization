@@ -119,8 +119,8 @@ int main() {
 
         std::cout << std::endl;
         
-        std::cout << "If you want to try another dataset, press s" << std::endl;
-        std::cout << "If you want to quit, press q" << std::endl;
+        std::cout << "If you want to try another dataset, press s." << std::endl;
+        std::cout << "If you want to quit, press q." << std::endl;
 
         std::cin >> action2;
         while (action2 != "s" && action2 != "q") {
