@@ -21,77 +21,112 @@
  * @return int Exit status.
  */
 int main() {
-    std::cout << "Please choose which dataset to use (1 - 10)" << std::endl;
-    std::string dataIndex, filePathPallets, filePathTruckAndPallets;
-    std::cin >> dataIndex;
-    std::cout << std::endl;
-
-    if (stoi(dataIndex) < 1 || stoi(dataIndex) > 10) {
-        std::cout << "Please select a dataset between 1 and 10" << std::endl;
-        return 1;
-    }
-    else if (dataIndex == "10") {
-        filePathPallets = "../data/Pallets_10.csv";
-        filePathTruckAndPallets = "../data/TruckAndPallets_10.csv";
-    }
-    else {
-        filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
-        filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
-    }
-
-    std::vector<Pallet> pallets = parsePalletsCSV(filePathPallets);
-    int capacity = parseTruckAndPalletsCSV(filePathTruckAndPallets);
-
-    std::cout << "Please choose which algorithm to use" << std::endl;
-    std::cout << "[1] Exhaustive Search" << std::endl;
-    std::cout << "[2] Backtracking" << std::endl;
-    std::cout << "[3] Dynamic Programming" << std::endl;
-    std::cout << "[4] Approximation Algorithm" << std::endl;
-    std::cout << "[5] Integer Linear Programming" << std::endl;
-    int algorithmIndex;
-    std::cin >> algorithmIndex;
-
-    std::vector<Pallet> result;
-    const auto start = std::chrono::system_clock::now();
-    switch (algorithmIndex) {
-        case 1:
-            result = exhaustiveSearch(pallets, capacity);
-            break;
-        case 2:
-            result = backtracking(pallets, capacity);
-            break;
-        case 3:
-            result = dynamicProgramming(pallets, capacity);
-            break;
-        case 4:
-            result = approximationAlgorithm(pallets, capacity);
-            break;
-        case 5:
-            result = integerLinearProgramming(pallets, capacity);
-            break;
-        default:
-            std::cout << "Please select one of the presented algorithms" << std::endl;
+    std::cout << "Welcome to the Delivery Truck Pallet Packing Optimization project!" << std::endl;
+    std::cout << "This project implements several algorithms to solve the 0/1 Knapsack problem." << std::endl;
+    std::cout << "To start just press s or press q to exit." << std::endl;
+    std::string action;
+    while (action != "s") {
+        std::cin >> action;
+        if (action == "q") {
+            std::cout << "Goodbye!" << std::endl;
+            return 0;
+        }
+        else if (action != "s") {
+            std::cout << "Please select a valid action" << std::endl;
             return 1;
+        }
     }
-    std::cout << std::endl;
+    std::string action2;
+    while (action2 != "q") {
+        std::cout << "Please choose which dataset to use (1 - 10)" << std::endl;
+        std::string dataIndex, filePathPallets, filePathTruckAndPallets;
+        std::cin >> dataIndex;
+        std::cout << std::endl;
 
-    const auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
-    std::cout << std::fixed << std::setprecision(6) << "Elapsed time: " << elapsed_seconds.count() << " seconds\n";
-    std::cout << std::endl;
+        if (stoi(dataIndex) < 1 || stoi(dataIndex) > 10) {
+            std::cout << "Please select a dataset between 1 and 10" << std::endl;
+            return 1;
+        }
+        else if (dataIndex == "10") {
+            filePathPallets = "../data/Pallets_10.csv";
+            filePathTruckAndPallets = "../data/TruckAndPallets_10.csv";
+        }
+        else {
+            filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
+            filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
+        }
 
-    std::cout << "Optimal solution:" << std::endl;
+        std::vector<Pallet> pallets = parsePalletsCSV(filePathPallets);
+        int capacity = parseTruckAndPalletsCSV(filePathTruckAndPallets);
 
-    int nPallets = pallets.size();
-    int totalWeight = 0;
-    int totalProfit = 0;
-    for (int i = 0; i < nPallets; i++) {
-        if (result[i].weight == 0 && result[i].profit == 0) continue;
-        totalWeight += result[i].weight;
-        totalProfit += result[i].profit;
-        std::cout << i + 1 << ' ' << result[i].weight << ' ' << result[i].profit << std::endl;
+        std::cout << "Please choose which algorithm to use" << std::endl;
+        std::cout << "[1] Exhaustive Search" << std::endl;
+        std::cout << "[2] Backtracking" << std::endl;
+        std::cout << "[3] Dynamic Programming" << std::endl;
+        std::cout << "[4] Approximation Algorithm" << std::endl;
+        std::cout << "[5] Integer Linear Programming" << std::endl;
+        int algorithmIndex;
+        std::cin >> algorithmIndex;
+
+        std::vector<Pallet> result;
+        const auto start = std::chrono::system_clock::now();
+        switch (algorithmIndex) {
+            case 1:
+                result = exhaustiveSearch(pallets, capacity);
+                break;
+            case 2:
+                result = backtracking(pallets, capacity);
+                break;
+            case 3:
+                result = dynamicProgramming(pallets, capacity);
+                break;
+            case 4:
+                result = approximationAlgorithm(pallets, capacity);
+                break;
+            case 5:
+                result = integerLinearProgramming(pallets, capacity);
+                break;
+            default:
+                std::cout << "Please select one of the presented algorithms" << std::endl;
+                return 1;
+        }
+
+        std::cout << std::endl;
+
+        const auto end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        std::cout << std::fixed << std::setprecision(6) << "Elapsed time: " << elapsed_seconds.count() << " seconds\n";
+        std::cout << std::endl;
+
+        if (algorithmIndex == 4) {
+            std::cout << "Approximate solution:" << std::endl;
+        }
+        else {
+            std::cout << "Optimal solution:" << std::endl;
+        }
+
+        int nPallets = pallets.size();
+        int totalWeight = 0;
+        int totalProfit = 0;
+        for (int i = 0; i < nPallets; i++) {
+            if (result[i].weight == 0 && result[i].profit == 0) continue;
+            totalWeight += result[i].weight;
+            totalProfit += result[i].profit;
+            std::cout << i + 1 << ' ' << result[i].weight << ' ' << result[i].profit << std::endl;
+        }
+        std::cout << "Total weight = " << totalWeight << std::endl;
+        std::cout << "Total profit = " << totalProfit << std::endl;
+
+        std::cout << std::endl;
+        
+        std::cout << "If you want to try another dataset, press s" << std::endl;
+        std::cout << "If you want to quit, press q" << std::endl;
+
+        std::cin >> action2;
+        while (action2 != "s" && action2 != "q") {
+            std::cout << "Please select a valid action" << std::endl;
+            std::cin >> action2;
+        }
     }
-    std::cout << "Total weight = " << totalWeight << std::endl;
-    std::cout << "Total profit = " << totalProfit << std::endl;
     return 0;
 }

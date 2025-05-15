@@ -1,3 +1,8 @@
+/**
+ * @file algorithms.cpp
+ * @brief Implements several strategies to solve the 0/1 Knapsack problem for pallet selection.
+ */
+
 #include "algorithms.h"
 #include <algorithm>
 #include <iostream>
@@ -7,6 +12,18 @@
 // ========================= EXHAUSTIVE SEARCH ========================== //
 // ====================================================================== //
 
+/**
+ * @brief Solves the knapsack problem using exhaustive (brute-force) search.
+ * 
+ * Iterates through all 2^n combinations of pallets, checking which subset
+ * fits within the weight capacity and yields the maximum profit.
+ * 
+ * @param pallets Vector of pallet objects.
+ * @param capacity Maximum weight capacity of the truck.
+ * @return Vector of selected pallets (others are returned as {0,0}).
+ * 
+ * @complexity Time: O(2^n * n), Space: O(n)
+ */
 std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int capacity) {
     size_t n = pallets.size();
     int bestProfit = 0;
@@ -33,8 +50,7 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
     for (size_t i = 0; i < n; i++) {
         if ((bestMask >> i) & 1) {
             result[i] = pallets[i];
-        }
-        else {
+        } else {
             result[i] = {0, 0};
         }
     }
@@ -54,23 +70,34 @@ std::vector<Pallet> backtracking(const std::vector<Pallet>& pallets, int capacit
 // ========================= DYNAMIC PROGRAMMING ======================== //
 // ====================================================================== //
 
+/**
+ * @brief Solves the knapsack problem using dynamic programming.
+ * 
+ * Builds a table dp[i][w] representing the maximum profit using the first i pallets
+ * with total weight ≤ w.
+ * 
+ * @param pallets Vector of pallet objects.
+ * @param capacity Maximum truck capacity.
+ * @return Vector of selected pallets (others are {0,0}).
+ * 
+ * @complexity Time: O(n * capacity), Space: O(n * capacity)
+ */
 std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int capacity) {
     int n = pallets.size();
-
     std::vector<std::vector<int>> dp(n + 1, std::vector<int>(capacity + 1));
 
     for (int i = 1; i <= n; i++) {
         Pallet currentPallet = pallets[i - 1];
         for (int j = 0; j <= capacity; j++) {
             dp[i][j] = dp[i - 1][j];
-            if (j - pallets[i - 1].weight < 0) continue;
-            dp[i][j] = std::max(dp[i][j], dp[i - 1][j - currentPallet.weight] + currentPallet.profit);
+            if (j - currentPallet.weight >= 0) {
+                dp[i][j] = std::max(dp[i][j], dp[i - 1][j - currentPallet.weight] + currentPallet.profit);
+            }
         }
     }
 
     std::vector<Pallet> result(n);
-    int i = n;
-    int j = capacity;
+    int i = n, j = capacity;
 
     while (i > 0 && j > 0) {
         if (dp[i][j] != dp[i - 1][j]) {
@@ -79,6 +106,7 @@ std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int c
         }
         i--;
     }
+
     return result;
 }
 
@@ -86,15 +114,24 @@ std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int c
 // ======================= APPROXIMATION ALGORITHM ====================== //
 // ====================================================================== //
 
+/**
+ * @brief Greedy solution A: selects pallets by highest profit/weight ratio.
+ * 
+ * @param pallets Vector of pallets.
+ * @param capacity Maximum truck capacity.
+ * @return Vector of selected pallets (others are {0,0}).
+ * 
+ * @complexity Time: O(n log n), Space: O(n)
+ */
 std::vector<Pallet> greedySolutionA(const std::vector<Pallet>& pallets, int capacity) {
     int n = pallets.size();
-
     std::vector<std::pair<Pallet, int>> items;
+
     for (int i = 0; i < n; i++) {
         items.push_back({pallets[i], i});
     }
 
-    std::sort(items.begin(), items.end(), [](std::pair<Pallet, int> a, std::pair<Pallet, int> b){
+    std::sort(items.begin(), items.end(), [](auto a, auto b){
         return (double)a.first.profit / a.first.weight > (double)b.first.profit / b.first.weight;
     });
 
@@ -106,22 +143,30 @@ std::vector<Pallet> greedySolutionA(const std::vector<Pallet>& pallets, int capa
         currentWeight += items[i].first.weight;
         result[items[i].second] = items[i].first;
     }
-    
+
     return result;
 }
 
+/**
+ * @brief Greedy solution B: selects pallets by highest profit, then lowest weight.
+ * 
+ * @param pallets Vector of pallets.
+ * @param capacity Maximum truck capacity.
+ * @return Vector of selected pallets (others are {0,0}).
+ * 
+ * @complexity Time: O(n log n), Space: O(n)
+ */
 std::vector<Pallet> greedySolutionB(const std::vector<Pallet>& pallets, int capacity) {
     int n = pallets.size();
-
     std::vector<std::pair<Pallet, int>> items;
+
     for (int i = 0; i < n; i++) {
         items.push_back({pallets[i], i});
     }
 
-    std::sort(items.begin(), items.end(), [](std::pair<Pallet, int> a, std::pair<Pallet, int> b){
-        if (a.first.profit == b.first.profit) {
+    std::sort(items.begin(), items.end(), [](auto a, auto b){
+        if (a.first.profit == b.first.profit)
             return a.first.weight < b.first.weight;
-        }
         return a.first.profit > b.first.profit;
     });
 
@@ -133,49 +178,79 @@ std::vector<Pallet> greedySolutionB(const std::vector<Pallet>& pallets, int capa
         currentWeight += items[i].first.weight;
         result[items[i].second] = items[i].first;
     }
-    
+
     return result;
 }
 
+/**
+ * @brief Chooses the better result between greedy A and greedy B.
+ * 
+ * @param pallets Vector of pallets.
+ * @param capacity Maximum truck capacity.
+ * @return Best of the two greedy solutions.
+ * 
+ * @complexity Time: O(n log n), Space: O(n)
+ */
 std::vector<Pallet> approximationAlgorithm(const std::vector<Pallet>& pallets, int capacity) {
     std::vector<Pallet> resultA = greedySolutionA(pallets, capacity);
     std::vector<Pallet> resultB = greedySolutionB(pallets, capacity);
 
-    int profitA = 0;
-    int profitB = 0;
+    int profitA = 0, profitB = 0;
+    for (const Pallet& p : resultA) profitA += p.profit;
+    for (const Pallet& p : resultB) profitB += p.profit;
 
-    for (Pallet p : resultA) profitA += p.profit;
-    for (Pallet p : resultB) profitB += p.profit;
-
-    if (profitA > profitB) return resultA;
-    else return resultB;
+    return (profitA > profitB) ? resultA : resultB;
 }
 
 // ====================================================================== //
 // ===================== INTEGER LINEAR PROGRAMMING ===================== //
 // ====================================================================== //
 
-// This function returns an upper bound for the remaining knapsack problem, by solving the fractional knapsack since it will always be at worst the same as the optimal solution
+/**
+ * @brief Computes an upper bound using fractional knapsack (LP-relaxation).
+ * 
+ * @param sortedPallets Items sorted by profit/weight.
+ * @param startIndex Index to begin from.
+ * @param currentWeight Current accumulated weight.
+ * @param capacity Total capacity of the truck.
+ * @return Fractional profit upper bound.
+ * 
+ * @complexity Time: O(n), Space: O(1)
+ */
 double lpBound(const std::vector<std::pair<Pallet, int>> sortedPallets, int startIndex, long long currentWeight, int capacity) {
-    // Assume the vector is sorted according to v/w
-    int n = sortedPallets.size();
     double remainingCapacity = capacity - currentWeight;
     double bound = 0;
-    for (int i = startIndex; i < n; i++) {
+
+    for (int i = startIndex; i < (int)sortedPallets.size(); i++) {
         int weight = sortedPallets[i].first.weight;
         int profit = sortedPallets[i].first.profit;
+
         if (weight > remainingCapacity) {
-            bound += profit * (remainingCapacity / capacity);
+            bound += profit * (remainingCapacity / weight);
             break;
-        }
-        else {
+        } else {
             remainingCapacity -= weight;
             bound += profit;
         }
     }
+
     return bound;
 }
 
+/**
+ * @brief Recursive Branch and Bound solver for ILP version of knapsack.
+ *
+ * @param sortedPallets Sorted pallet list with original indices.
+ * @param currentIndex Current index in recursion.
+ * @param currentWeight Current total weight.
+ * @param currentProfit Current total profit.
+ * @param capacity Maximum truck capacity.
+ * @param currentTake Vector storing current binary decisions.
+ * @param bestTake Vector storing best binary decisions found.
+ * @param bestProfit Tracks the best profit found.
+ * 
+ * @complexity Time: Exponential (pruned), Space: O(n)
+ */
 void branchAndBoundSearch(
     const std::vector<std::pair<Pallet, int>>& sortedPallets,
     int currentIndex,
@@ -194,45 +269,42 @@ void branchAndBoundSearch(
         }
         return;
     }
+
     double estimate = currentProfit + lpBound(sortedPallets, currentIndex, currentWeight, capacity);
     if (estimate <= bestProfit) return;
 
     Pallet pallet = sortedPallets[currentIndex].first;
-    if (currentWeight + sortedPallets[currentIndex].first.weight <= capacity) {
+    if (currentWeight + pallet.weight <= capacity) {
         currentTake[currentIndex] = 1;
-        branchAndBoundSearch(
-            sortedPallets,
-            currentIndex + 1,
-            currentWeight + pallet.weight,
-            currentProfit + pallet.profit,
-            capacity,
-            currentTake,
-            bestTake,
-            bestProfit
-        );
+        branchAndBoundSearch(sortedPallets, currentIndex + 1, currentWeight + pallet.weight,
+                             currentProfit + pallet.profit, capacity, currentTake, bestTake, bestProfit);
         currentTake[currentIndex] = 0;
     }
-    branchAndBoundSearch(
-        sortedPallets,
-        currentIndex + 1,
-        currentWeight,
-        currentProfit,
-        capacity,
-        currentTake,
-        bestTake,
-        bestProfit
-    );
+
+    branchAndBoundSearch(sortedPallets, currentIndex + 1, currentWeight, currentProfit,
+                         capacity, currentTake, bestTake, bestProfit);
 }
 
+/**
+ * @brief Solves the 0/1 knapsack problem using Branch and Bound (ILP).
+ * 
+ * Sorts items by value/weight ratio, estimates upper bounds using fractional knapsack,
+ * and prunes unpromising branches.
+ * 
+ * @param pallets Vector of pallet items.
+ * @param capacity Maximum truck weight.
+ * @return Vector of selected pallets.
+ * 
+ * @complexity Time: Exponential (with pruning), Space: O(n)
+ */
 std::vector<Pallet> integerLinearProgramming(const std::vector<Pallet>& pallets, int capacity) {
     int n = pallets.size();
+    std::vector<std::pair<Pallet, int>> items;
 
-    std::vector<std::pair<Pallet,int>> items;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i)
         items.push_back({pallets[i], i});
-    }
-    
-    std::sort(items.begin(), items.end(), [](std::pair<Pallet, int> a, std::pair<Pallet, int> b){
+
+    std::sort(items.begin(), items.end(), [](auto a, auto b){
         return (double)a.first.profit / a.first.weight > (double)b.first.profit / b.first.weight;
     });
 
@@ -248,5 +320,6 @@ std::vector<Pallet> integerLinearProgramming(const std::vector<Pallet>& pallets,
             result[originalIndex] = items[i].first;
         }
     }
+
     return result;
 }
