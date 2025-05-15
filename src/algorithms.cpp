@@ -39,7 +39,7 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
 }
 
 std::vector<Pallet> backtracking(const std::vector<Pallet>& pallets, int capacity) {
-
+    return {};
 }
 
 std::vector<Pallet> dynamicProgramming(const std::vector<Pallet>& pallets, int capacity) {

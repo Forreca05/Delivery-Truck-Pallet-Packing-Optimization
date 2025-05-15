@@ -66,6 +66,9 @@ int main() {
         case 4:
             result = approximationAlgorithm(pallets, capacity);
             break;
+        case 5:
+            result = integerLinearProgramming(pallets, capacity);
+            break;
         default:
             std::cout << "Please select one of the presented algorithms" << std::endl;
             return 1;
