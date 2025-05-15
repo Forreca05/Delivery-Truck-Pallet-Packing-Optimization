@@ -5,13 +5,23 @@
 #include "parser.h"
 
 int main() {
-    std::cout << "Please choose which dataset to use (1 - 9)" << std::endl;
-    std::string dataIndex;
+    std::cout << "Please choose which dataset to use (1 - 10)" << std::endl;
+    std::string dataIndex, filePathPallets, filePathTruckAndPallets;
     std::cin >> dataIndex;
     std::cout << std::endl;
 
-    std::string filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
-    std::string filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
+    if (dataIndex < "1" || dataIndex > "10") {
+        std::cout << "Please select a dataset between 1 and 10" << std::endl;
+        return 1;
+    }
+    else if (dataIndex == "10") {
+        filePathPallets = "../data/Pallets_10.csv";
+        filePathTruckAndPallets = "../data/TruckAndPallets_10.csv";
+    }
+    else {
+        filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
+        filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
+    }
     
     std::vector<Pallet> pallets = parsePalletsCSV(filePathPallets);
     int capacity = parseTruckAndPalletsCSV(filePathTruckAndPallets);
