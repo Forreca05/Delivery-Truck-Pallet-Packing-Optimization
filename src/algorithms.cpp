@@ -33,6 +33,7 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
             result[i] = {0, 0};
         }
     }
+ 
     return result;
 }
 

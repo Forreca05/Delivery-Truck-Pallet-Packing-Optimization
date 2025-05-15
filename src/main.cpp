@@ -1,3 +1,5 @@
+#include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -24,6 +26,7 @@ int main() {
     std::cin >> algorithmIndex;
 
     std::vector<Pallet> result;
+    const auto start = std::chrono::system_clock::now();
     switch (algorithmIndex) {
         case 1:
             result = exhaustiveSearch(pallets, capacity);
@@ -38,6 +41,11 @@ int main() {
             std::cout << "Please select one of the presented algorithms" << std::endl;
             return 1;
     }
+    std::cout << std::endl;
+
+    const auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << std::fixed << std::setprecision(6) << "Elapsed time: " << elapsed_seconds.count() << " seconds\n";
     std::cout << std::endl;
 
     std::cout << "Optimal solution:" << std::endl;
