@@ -62,8 +62,98 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
 // ============================ BACKTRACKING ============================ //
 // ====================================================================== //
 
+/**
+ * @brief Recursive helper for the 0/1 knapsack backtracking solution.
+ * 
+ * Explores all subsets of the given pallets, tracking current weight and profit,
+ * and updates the best-known solution when all items have been considered.
+ * 
+ * @param pallets Vector of pallet objects (weight, profit).
+ * @param currentIndex Current index in recursion.
+ * @param currentWeight Current total weight.
+ * @param currentProfit Current total profit.
+ * @param capacity Maximum truck capacity.
+ * @param currentTake Vector storing current binary decisions.
+ * @param bestTake Vector storing best binary decisions found.
+ * @param bestProfit Tracks the best profit found.
+ * 
+ * @complexity Time: O(2^n), Space: O(n)
+ */
+void backtrackingHelper(
+    const std::vector<Pallet>& pallets,
+    int currentIndex,
+    long long currentWeight,
+    long long currentProfit,
+    int capacity,
+    std::vector<int>& currentTake,
+    std::vector<int>& bestTake,
+    long long& bestProfit
+) {
+    int n = pallets.size();
+    if (currentIndex == n) {
+        if (currentProfit > bestProfit) {
+            bestProfit = currentProfit;
+            bestTake = currentTake;
+        }
+        return;
+    }
+
+    Pallet pallet = pallets[currentIndex];
+    if (currentWeight + pallet.weight <= capacity) {
+        currentTake[currentIndex] = 1;
+        backtrackingHelper(
+            pallets,
+            currentIndex + 1,
+            currentWeight + pallet.weight,
+            currentProfit + pallet.profit,
+            capacity,
+            currentTake,
+            bestTake,
+            bestProfit
+        );
+        currentTake[currentIndex] = 0;
+    }
+
+    backtrackingHelper(
+        pallets,
+        currentIndex + 1,
+        currentWeight,
+        currentProfit,
+        capacity,
+        currentTake,
+        bestTake,
+        bestProfit
+    );
+}
+
+/**
+ * @brief Solves the 0/1 knapsack problem via brute-force backtracking.
+ * 
+ * Initializes tracking vectors and invokes backtrackingHelper to explore
+ * all inclusion/exclusion combinations, then returns the selected pallets.
+ * 
+ * @param pallets Vector of pallet objects (weight, profit).
+ * @param capacity Maximum allowed weight capacity.
+ * @return Vector of selected pallets; pallets not chosen are omitted.
+ * 
+ * @complexity Time: O(2^n), Space: O(n)
+ */
 std::vector<Pallet> backtracking(const std::vector<Pallet>& pallets, int capacity) {
-    
+    int n = pallets.size();
+
+    std::vector<int> bestTake(n, 0), currTake(n, 0);
+    long long bestProfit = 0;
+
+    backtrackingHelper(pallets, 0, 0, 0, capacity, currTake, bestTake, bestProfit);
+
+    std::vector<Pallet> result(n);
+    for (int i = 0; i < n; i++) {
+        if (bestTake[i]) {
+            result[i] = pallets[i];
+        }
+    }
+
+    return result;
 }
 
 // ====================================================================== //
@@ -217,7 +307,7 @@ std::vector<Pallet> approximationAlgorithm(const std::vector<Pallet>& pallets, i
  * 
  * @complexity Time: O(n), Space: O(1)
  */
-double lpBound(const std::vector<std::pair<Pallet, int>> sortedPallets, int startIndex, long long currentWeight, int capacity) {
+double lpBound(const std::vector<std::pair<Pallet, int>>& sortedPallets, int startIndex, long long currentWeight, int capacity) {
     double remainingCapacity = capacity - currentWeight;
     double bound = 0;
 
@@ -276,13 +366,29 @@ void branchAndBoundSearch(
     Pallet pallet = sortedPallets[currentIndex].first;
     if (currentWeight + pallet.weight <= capacity) {
         currentTake[currentIndex] = 1;
-        branchAndBoundSearch(sortedPallets, currentIndex + 1, currentWeight + pallet.weight,
-                             currentProfit + pallet.profit, capacity, currentTake, bestTake, bestProfit);
+        branchAndBoundSearch(
+            sortedPallets,
+            currentIndex + 1,
+            currentWeight + pallet.weight,
+            currentProfit + pallet.profit,
+            capacity,
+            currentTake,
+            bestTake,
+            bestProfit
+        );
         currentTake[currentIndex] = 0;
     }
 
-    branchAndBoundSearch(sortedPallets, currentIndex + 1, currentWeight, currentProfit,
-                         capacity, currentTake, bestTake, bestProfit);
+    branchAndBoundSearch(
+        sortedPallets,
+        currentIndex + 1,
+        currentWeight,
+        currentProfit,
+        capacity,
+        currentTake,
+        bestTake,
+        bestProfit
+    );
 }
 
 /**

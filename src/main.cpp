@@ -95,8 +95,6 @@ int main() {
 
         const auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
-        std::cout << std::fixed << std::setprecision(6) << "Elapsed time: " << elapsed_seconds.count() << " seconds\n";
-        std::cout << std::endl;
 
         if (algorithmIndex == 4) {
             std::cout << "Approximate solution:" << std::endl;
@@ -116,6 +114,9 @@ int main() {
         }
         std::cout << "Total weight = " << totalWeight << std::endl;
         std::cout << "Total profit = " << totalProfit << std::endl;
+
+        std::cout << std::fixed << std::setprecision(6) << "Elapsed time: " << elapsed_seconds.count() << " seconds\n";
+        std::cout << std::endl;
 
         std::cout << std::endl;
         
