@@ -3,10 +3,8 @@
  * @brief Implements several strategies to solve the 0/1 Knapsack problem for pallet selection.
  */
 
-#include "algorithms.h"
 #include <algorithm>
-#include <iostream>
-#include <functional>
+#include "algorithms.h"
 
 // ====================================================================== //
 // ========================= EXHAUSTIVE SEARCH ========================== //
