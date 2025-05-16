@@ -412,8 +412,21 @@ std::vector<Pallet> integerLinearProgramming(const std::vector<Pallet>& pallets,
         return (double)a.first.profit / a.first.weight > (double)b.first.profit / b.first.weight;
     });
 
-    std::vector<int> bestTake(n, 0), currTake(n, 0);
+    std::vector<int> currTake(n, 0), bestTake(n, 0);
+
+    // Greedy initialization for better pruning
     long long bestProfit = 0;
+    long long currentWeight = 0;
+
+    for (int i = 0; i < n; ++i) {
+        const auto& pallet = items[i].first;
+        if (currentWeight + pallet.weight <= capacity) {
+            bestTake[i] = 1;
+            currentWeight += pallet.weight;
+            bestProfit += pallet.profit;
+        }
+    }
+    
 
     branchAndBoundSearch(items, 0, 0, 0, capacity, currTake, bestTake, bestProfit);
 
