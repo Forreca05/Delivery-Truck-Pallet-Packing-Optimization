@@ -47,7 +47,7 @@ std::vector<Pallet> exhaustiveSearch(const std::vector<Pallet>& pallets, int cap
 // ====================================================================== //
 
 std::vector<Pallet> backtracking(const std::vector<Pallet>& pallets, int capacity) {
-    return {};
+    
 }
 
 // ====================================================================== //
@@ -165,7 +165,7 @@ double lpBound(const std::vector<std::pair<Pallet, int>> sortedPallets, int star
         int weight = sortedPallets[i].first.weight;
         int profit = sortedPallets[i].first.profit;
         if (weight > remainingCapacity) {
-            bound += profit * (remainingCapacity / capacity);
+            bound += profit * (remainingCapacity / weight);
             break;
         }
         else {
