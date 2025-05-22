@@ -5,8 +5,8 @@ CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -O2
 
 # Source files
-SRCS := main.cpp algorithms.cpp parser.cpp
-HEADERS := algorithms.h parser.h pallet.h
+SRCS := main.cpp algorithms.cpp parser.cpp benchmark.cpp
+HEADERS := algorithms.h parser.h pallet.h benchmark.h
 
 # Output binary
 TARGET := main

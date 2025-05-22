@@ -1,0 +1,21 @@
+# Basic settings
+PROJECT_NAME           = "Delivery Truck Pallet Packing Optimization Tool"
+PROJECT_BRIEF          = "Optimal pallet loading strategies using 0/1 knapsack algorithms"
+OUTPUT_DIRECTORY       = docs/
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO  # Disable LaTeX if you only need HTML
+
+# Input settings
+INPUT                  = src/  # Path to your source code directory
+RECURSIVE              = YES  # Scan subdirectories
+FILE_PATTERNS          = *.cpp *.h  # File extensions to process
+
+# Extraction settings
+EXTRACT_ALL            = YES  # Document all entities
+EXTRACT_PRIVATE        = YES  # Include private members
+EXTRACT_STATIC         = YES  # Include static members
+
+# Diagrams (requires Graphviz)
+HAVE_DOT               = YES
+CLASS_DIAGRAMS         = YES
+CALL_GRAPH             = YES

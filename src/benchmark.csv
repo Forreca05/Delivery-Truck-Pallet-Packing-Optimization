@@ -1,0 +1,51 @@
+Algorithm,Dataset,Time(sec)
+Exhaustive Search,1,8.7303e-05
+Backtracking,1,1.645e-05
+Dynamic Programming,1,2.9305e-05
+Approximation,1,5.841e-06
+ILP,1,1.07e-05
+Exhaustive Search,2,0.00133346
+Backtracking,2,8.135e-06
+Dynamic Programming,2,2.9906e-05
+Approximation,2,7.985e-06
+ILP,2,7.665e-06
+Exhaustive Search,3,4.28e-05
+Backtracking,3,1.0029e-05
+Dynamic Programming,3,1.0279e-05
+Approximation,3,7.745e-06
+ILP,3,5.08e-06
+Exhaustive Search,4,-1
+Backtracking,4,0.0536479
+Dynamic Programming,4,0.000116869
+Approximation,4,1.1832e-05
+ILP,4,2.2272e-05
+Exhaustive Search,5,-1
+Backtracking,5,0.133024
+Dynamic Programming,5,6.392e-06
+Approximation,5,1.4557e-05
+ILP,5,8.356e-06
+Exhaustive Search,6,-1
+Backtracking,6,-1
+Dynamic Programming,6,0.0312974
+Approximation,6,0.00015002
+ILP,6,9.615e-05
+Exhaustive Search,7,0.000729232
+Backtracking,7,6.1274e-05
+Dynamic Programming,7,9.558e-06
+Approximation,7,2.525e-06
+ILP,7,5.33e-06
+Exhaustive Search,8,0.000739411
+Backtracking,8,3.2781e-05
+Dynamic Programming,8,6.371e-06
+Approximation,8,1.693e-06
+ILP,8,4.408e-06
+Exhaustive Search,9,0.00251288
+Backtracking,9,0.000170559
+Dynamic Programming,9,2.935e-06
+Approximation,9,1.242e-06
+ILP,9,2.845e-06
+Exhaustive Search,10,3e-07
+Backtracking,10,5.51e-07
+Dynamic Programming,10,6.11e-07
+Approximation,10,4.61e-07
+ILP,10,4.91e-07

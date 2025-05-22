@@ -1,0 +1,13 @@
+digraph "approximationAlgorithm"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="approximationAlgorithm",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Returns best of two greedy approximation approaches."];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="greedySolutionA",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$algorithms_8cpp.html#a0a9d73dc5b7c6360232878905d718ee7",tooltip="Greedy heuristic using profit/weight ratio sorting."];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="greedySolutionB",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$algorithms_8cpp.html#aa4402a4577b89b4a3f9e19e526a30568",tooltip="Greedy heuristic using profit-first sorting."];
+}

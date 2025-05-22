@@ -1,133 +1,170 @@
 /**
  * @file main.cpp
- * @brief Entry point for the Delivery Truck Pallet Packing Optimization project.
+ * @brief Entry point for the Delivery Truck Pallet Packing Optimization project with enhanced CLI and tabular results.
  */
 
 #include <chrono>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 #include "algorithms.h"
 #include "parser.h"
+#include "benchmark.h"
 
-/**
- * @brief The main function providing a CLI to choose dataset and algorithm.
- * 
- * Users can choose between 10 datasets and 5 different algorithms (exhaustive, backtracking,
- * dynamic programming, approximation and integer linear). It loads the data, runs the selected algorithm,
- * and prints the resulting optimal (or approximate) pallet packing.
- * 
- * @return int Exit status.
- */
+namespace fs = std::filesystem;
+
+// Helper to get a line of input and trim whitespace
+static std::string promptLine(const std::string &prompt) {
+    std::string input;
+    std::cout << prompt;
+    std::getline(std::cin, input);
+    if (input.empty()) {
+        std::getline(std::cin, input);
+    }
+    return input;
+}
+
+// Ask user to pick from minOption..maxOption, returns chosen int
+static int promptNumber(const std::string &prompt, int minOption, int maxOption) {
+    int choice;
+    while (true) {
+        std::cout << prompt;
+        if (std::cin >> choice && choice >= minOption && choice <= maxOption) {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return choice;
+        }
+        std::cout << "Invalid selection. Enter a number between "
+                  << minOption << " and " << maxOption << ".\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
+// Validate that file exists and is readable
+static bool validateFile(const std::string &path) {
+    if (!fs::exists(path)) {
+        std::cout << "Error: File not found: " << path << "\n";
+        return false;
+    }
+    if (!fs::is_regular_file(path)) {
+        std::cout << "Error: Not a regular file: " << path << "\n";
+        return false;
+    }
+    return true;
+}
+
 int main() {
-    std::cout << "Welcome to the Delivery Truck Pallet Packing Optimization project!" << std::endl;
-    std::cout << "This project implements several algorithms to solve the 0/1 Knapsack problem." << std::endl;
-    std::cout << "To start just press s or press q to exit." << std::endl;
-    std::string action;
-    while (action != "s") {
-        std::cin >> action;
-        if (action == "q") {
-            std::cout << "Goodbye!" << std::endl;
+    std::cout << "=== Delivery Truck Pallet Packing Optimization Tool ===\n";
+    std::cout << "Solve the 0/1 Knapsack problem using various algorithms.\n";
+    
+    bool running = true;
+    while (running) {
+        std::cout << "\nChoose input source:\n"
+                  << " [1] Predefined dataset (1-10)\n"
+                  << " [2] Custom file paths\n"
+                  << " [Q] Quit\n";
+        std::string selection;
+        std::getline(std::cin, selection);
+        if (selection == "Q" || selection == "q") {
+            std::cout << "Goodbye!\n";
+            break;
+        }
+
+        std::string palletsPath, truckPath;
+        if (selection == "1") {
+            int idx = promptNumber("Select dataset number (1-10): ", 1, 10);
+            char buf[16];
+            std::snprintf(buf, sizeof(buf), "%02d", idx);
+            palletsPath = "../data/Pallets_" + std::string(buf) + ".csv";
+            truckPath   = "../data/TruckAndPallets_" + std::string(buf) + ".csv";
+            std::cout << "Loading dataset " << idx << "...\n";
+        }
+        else if (selection == "2") {
+            do {
+                palletsPath = promptLine("Enter path to Pallets CSV: ");
+            } while (!validateFile(palletsPath));
+            do {
+                truckPath = promptLine("Enter path to Truck specification CSV: ");
+            } while (!validateFile(truckPath));
+        }
+        else if (selection == "b") {
+            runBenchmarks();
+            std::cout << "Benchmark data saved to benchmark.csv\n";
             return 0;
         }
-        else if (action != "s") {
-            std::cout << "Please select a valid action" << std::endl;
-            return 1;
-        }
-    }
-    std::string action2;
-    while (action2 != "q") {
-        std::cout << "Please choose which dataset to use (1 - 10)" << std::endl;
-        std::string dataIndex, filePathPallets, filePathTruckAndPallets;
-        std::cin >> dataIndex;
-        std::cout << std::endl;
-
-        if (stoi(dataIndex) < 1 || stoi(dataIndex) > 10) {
-            std::cout << "Please select a dataset between 1 and 10" << std::endl;
-            return 1;
-        }
-        else if (dataIndex == "10") {
-            filePathPallets = "../data/Pallets_10.csv";
-            filePathTruckAndPallets = "../data/TruckAndPallets_10.csv";
-        }
         else {
-            filePathPallets = "../data/Pallets_0" + dataIndex + ".csv";
-            filePathTruckAndPallets = "../data/TruckAndPallets_0" + dataIndex + ".csv";
+            std::cout << "Invalid option. Please select 1, 2, or Q.\n";
+            continue;
         }
 
-        std::vector<Pallet> pallets = parsePalletsCSV(filePathPallets);
-        int capacity = parseTruckAndPalletsCSV(filePathTruckAndPallets);
+        // parse inputs
+        std::vector<Pallet> pallets;
+        int capacity = 0;
+        try {
+            pallets = parsePalletsCSV(palletsPath);
+            capacity = parseTruckAndPalletsCSV(truckPath);
+        } catch (const std::exception &e) {
+            std::cout << "Error parsing files: " << e.what() << "\n";
+            continue;
+        }
 
-        std::cout << "Please choose which algorithm to use" << std::endl;
-        std::cout << "[1] Exhaustive Search" << std::endl;
-        std::cout << "[2] Backtracking" << std::endl;
-        std::cout << "[3] Dynamic Programming" << std::endl;
-        std::cout << "[4] Approximation Algorithm" << std::endl;
-        std::cout << "[5] Integer Linear Programming" << std::endl;
-        int algorithmIndex;
-        std::cin >> algorithmIndex;
+        // choose algorithm
+        std::cout << "\nSelect algorithm:\n"
+                  << " [1] Exhaustive Search\n"
+                  << " [2] Backtracking\n"
+                  << " [3] Dynamic Programming\n"
+                  << " [4] Approximation\n"
+                  << " [5] Integer Linear Programming\n";
+        int algo = promptNumber("Enter choice (1-5): ", 1, 5);
 
+        // run and time
+        auto start = std::chrono::steady_clock::now();
         std::vector<Pallet> result;
-        const auto start = std::chrono::system_clock::now();
-        switch (algorithmIndex) {
-            case 1:
-                result = exhaustiveSearch(pallets, capacity);
-                break;
-            case 2:
-                result = backtracking(pallets, capacity);
-                break;
-            case 3:
-                result = dynamicProgramming(pallets, capacity);
-                break;
-            case 4:
-                result = approximationAlgorithm(pallets, capacity);
-                break;
-            case 5:
-                result = integerLinearProgramming(pallets, capacity);
-                break;
-            default:
-                std::cout << "Please select one of the presented algorithms" << std::endl;
-                return 1;
+        switch (algo) {
+            case 1: result = exhaustiveSearch(pallets, capacity); break;
+            case 2: result = backtracking(pallets, capacity);   break;
+            case 3: result = dynamicProgramming(pallets, capacity); break;
+            case 4: result = approximationAlgorithm(pallets, capacity); break;
+            case 5: result = integerLinearProgramming(pallets, capacity); break;
         }
+        auto end = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double>(end - start).count();
 
-        std::cout << std::endl;
+        // display results in table
+        std::cout << "\n" << (algo == 4 ? "Approximate" : "Optimal")
+                  << " solution:\n";
+        std::cout << std::left
+                  << std::setw(12) << "Pallet ID"
+                  << std::setw(12) << "Weight"
+                  << std::setw(12) << "Profit" << "\n";
+        std::cout << std::string(36, '-') << "\n";
 
-        const auto end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end - start;
-
-        if (algorithmIndex == 4) {
-            std::cout << "Approximate solution:" << std::endl;
+        int count = 0, totalW = 0, totalP = 0;
+        for (size_t i = 0; i < result.size(); ++i) {
+            if (result[i].weight > 0) {
+                ++count;
+                totalW += result[i].weight;
+                totalP += result[i].profit;
+                std::cout << std::left
+                          << std::setw(12) << (i + 1)
+                          << std::setw(12) << result[i].weight
+                          << std::setw(12) << result[i].profit << "\n";
+            }
         }
-        else {
-            std::cout << "Optimal solution:" << std::endl;
-        }
+        std::cout << std::string(36, '-') << "\n";
+        std::cout << std::left
+                  << std::setw(12) << "Total"
+                  << std::setw(12) << totalW
+                  << std::setw(12) << totalP << "\n";
+        std::cout << std::fixed << std::setprecision(6)
+                  << "Elapsed time: " << elapsed << "s\n";
 
-        int nPallets = pallets.size();
-        int totalWeight = 0;
-        int totalProfit = 0;
-        for (int i = 0; i < nPallets; i++) {
-            if (result[i].weight == 0 && result[i].profit == 0) continue;
-            totalWeight += result[i].weight;
-            totalProfit += result[i].profit;
-            std::cout << i + 1 << ' ' << result[i].weight << ' ' << result[i].profit << std::endl;
-        }
-        std::cout << "Total weight = " << totalWeight << std::endl;
-        std::cout << "Total profit = " << totalProfit << std::endl;
-
-        std::cout << std::fixed << std::setprecision(6) << "Elapsed time: " << elapsed_seconds.count() << " seconds\n";
-        std::cout << std::endl;
-
-        std::cout << std::endl;
-        
-        std::cout << "If you want to try another dataset, press s." << std::endl;
-        std::cout << "If you want to quit, press q." << std::endl;
-
-        std::cin >> action2;
-        while (action2 != "s" && action2 != "q") {
-            std::cout << "Please select a valid action" << std::endl;
-            std::cin >> action2;
-        }
+        // ask to continue
+        std::cout << "\nPress Enter to return to main menu...";
+        std::cin.get();
     }
     return 0;
 }
